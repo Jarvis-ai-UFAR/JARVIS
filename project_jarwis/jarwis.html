@@ -1642,7 +1642,99 @@ if (swSound) {
 
 </script>
 
+<style>
+  /* ===== JARWIS RESPONSIVE LAYOUT ===== */
 
+/* Tablets / small laptops */
+@media (max-width: 1024px) {
+  .app {
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+}
+
+/* Phones */
+@media (max-width: 768px) {
+  body {
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  /* Stack sidebar above main content */
+  .app {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px 10px 16px;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    padding: 14px 12px;
+  }
+
+  .panel {
+    padding: 14px 12px;
+    height: auto;
+  }
+
+  /* Header wraps nicely */
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .header .left h2 {
+    font-size: 16px;
+  }
+
+  .header .left p {
+    font-size: 12px;
+  }
+
+  /* Search bar takes full width on small screens */
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  /* Top-right actions (if you enable them later) */
+  .top-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 480px) {
+  .app {
+    padding: 8px 8px 14px;
+  }
+
+  .sidebar {
+    padding: 12px 10px;
+  }
+
+  .panel {
+    padding: 12px 10px;
+  }
+}
+
+  
+</style>
 
 </body>
 </html>
+
