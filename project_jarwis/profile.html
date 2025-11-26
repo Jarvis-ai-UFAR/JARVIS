@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile — Jarwis</title>
+
+  <!-- Your main site styles (buttons, fonts, etc.) -->
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(1200px 800px at 15% -10%, rgba(96,165,250,0.12), transparent 60%),
+        radial-gradient(900px 700px at 100% 0%, rgba(94,234,212,0.1), transparent 50%),
+        #0b0f19;
+    }
+
+    .profile-shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 24px;
+    }
+
+    .profile-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 28px;
+      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.9));
+      border-radius: 22px;
+      border: 1px solid rgba(148,163,184,0.25);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+      padding: 28px 32px;
+    }
+
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .profile-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .profile-subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    .profile-section-title {
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #60a5fa;
+      margin-bottom: 8px;
+    }
+
+    .field-group {
+      margin-bottom: 14px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.82rem;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .profile-input {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 12px;
+      border: 1px solid #1f2933;
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    }
+
+    .profile-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.7);
+      background: rgba(15,23,42,0.98);
+    }
+
+    .profile-input[disabled] {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .profile-meta {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .profile-actions-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    /* Button style (matches your .btn from style.css, with ghost variation) */
+    .btn {
+      background: #00aaff;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: 0.25s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: #0088cc;
+      box-shadow: 0 0 15px rgba(0,170,255,0.55);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: #38bdf8;
+      border: 1px solid rgba(56,189,248,0.8);
+      box-shadow: none;
+    }
+
+    .btn.ghost:hover {
+      background: rgba(56,189,248,0.1);
+    }
+
+    .profile-message {
+      font-size: 0.82rem;
+      min-height: 1.2em;
+      margin-top: 4px;
+    }
+
+    .profile-footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: #9ca3af;
+    }
+
+    @media (max-width: 768px) {
+      .profile-card {
+        grid-template-columns: 1fr;
+        padding: 22px 18px;
+      }
+      .profile-shell {
+        padding: 16px;
+      }
+      .profile-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn {
+        width: 100%;
+        text-align: center;
+      }
+      .profile-footer-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body data-protected="true">
+  <div class="profile-shell">
+    <div class="profile-card">
+      <!-- LEFT: account info -->
+      <div>
+        <div class="profile-header">
+          <div class="profile-title">Account profile</div>
+          <div class="profile-subtitle">
+            Connected as <span data-current-user-email>user@example.com</span>
+          </div>
+        </div>
+
+        <div class="profile-section-title">Account info</div>
+
+        <form id="profileInfoForm">
+          <div class="field-group">
+            <label class="field-label" for="profileName">Full name</label>
+            <input id="profileName" class="profile-input" type="text" placeholder="Your name">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="profileEmail">Email</label>
+            <input id="profileEmail" class="profile-input" type="email" disabled>
+            <div class="profile-meta">
+              Email cannot be changed from here.
+            </div>
+          </div>
+
+          <button type="submit" class="btn">Save profile</button>
+          <div id="profileMessage" class="profile-message"></div>
+        </form>
+
+        <div class="profile-footer-actions">
+          <div>
+            Member since
+            <span id="userCreatedAt">—</span>
+          </div>
+          <button class="btn ghost" onclick="window.location.href='jarwis.html'">
+            ← Back to dashboard
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT: password reset -->
+      <div>
+        <div class="profile-section-title">Security</div>
+        <h2 style="font-size:1.1rem;margin:0 0 6px;">Change password</h2>
+        <p style="font-size:0.84rem;color:#9ca3af;margin:0 0 14px;">
+          Update your password for this Jarwis account.
+        </p>
+
+        <form id="passwordForm">
+          <div class="field-group">
+            <label class="field-label" for="currentPassword">Current password</label>
+            <input id="currentPassword" class="profile-input" type="password" autocomplete="current-password">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="newPassword">New password</label>
+            <input id="newPassword" class="profile-input" type="password" autocomplete="new-password">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="confirmNewPassword">Confirm new password</label>
+            <input id="confirmNewPassword" class="profile-input" type="password" autocomplete="new-password">
+          </div>
+
+          <button type="submit" class="btn">Update password</button>
+          <div id="passwordMessage" class="profile-message"></div>
+        </form>
+
+        <div style="margin-top:18px;border-top:1px solid rgba(148,163,184,0.25);padding-top:14px;">
+          <div style="font-size:0.85rem;color:#9ca3af;margin-bottom:8px;">
+            Want to switch account?
+          </div>
+          <div class="profile-actions-row">
+            <button class="btn ghost" data-logout onclick="logout()">Logout</button>
+            <button class="btn" onclick="window.location.href='login.html'">Login with another email</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>

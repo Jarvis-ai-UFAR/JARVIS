@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8">
+  <title>Գրանցում — Jarwis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #f9fafb;
+      background:
+        radial-gradient(1000px 800px at 10% 0%, rgba(96,165,250,0.15), transparent 60%),
+        radial-gradient(900px 700px at 100% 100%, rgba(52,211,153,0.18), transparent 55%),
+        #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: rgba(15,23,42,0.9);
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.65);
+      border: 1px solid rgba(148,163,184,0.2);
+      padding: 2.2rem 2.4rem;
+      width: 100%;
+      max-width: 420px;
+      backdrop-filter: blur(18px);
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.7rem;
+    }
+
+    p.subtitle {
+      margin: 0 0 1.8rem;
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.65rem 0.8rem;
+      margin-bottom: 0.9rem;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background: rgba(15,23,42,0.9);
+      color: #f9fafb;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.6);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.7rem;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: #f9fafb;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.4rem;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    .alt {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      text-align: center;
+      color: #9ca3af;
+    }
+
+    .alt a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+
+    #authMessage {
+      margin-top: 0.7rem;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Գրանցում Jarwis-ում</h1>
+    <p class="subtitle">Մուտք գործելու համար ստեղծիր հաշիվ։</p>
+
+    <form id="registerForm">
+      <label for="regName">Անուն, ազգանուն</label>
+      <input type="text" id="regName" placeholder="Օրինակ՝ Արման Տեր-Ստեփանյան">
+
+      <label for="regEmail">Email</label>
+      <input type="email" id="regEmail" placeholder="you@example.com">
+
+      <label for="regPassword">Գաղտնաբառ</label>
+      <input type="password" id="regPassword" placeholder="Առնվազն 6 նշան">
+
+      <label for="regPasswordConfirm">Կրկնիր գաղտնաբառը</label>
+      <input type="password" id="regPasswordConfirm" placeholder="Կրկնիր գաղտնաբառը">
+
+      <button type="submit">Գրանցվել</button>
+    </form>
+
+    <div id="authMessage"></div>
+
+    <p class="alt">
+      Уже есть аккаунт? <a href="login.html">Մուտք գործել</a>
+    </p>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>
