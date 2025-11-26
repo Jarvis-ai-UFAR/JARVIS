@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<title>Jarwis — Dashboard (Dark)</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  /* Event Delete Button (Time Management) */
+  .event-item .event-delete-btn {
+    background: linear-gradient(90deg, #ff6a6a 0%, #e74c3c 100%);
+    color: #fff;
+    border: none;
+    border-radius: 18px;
+    padding: 6px 18px;
+    margin-left: 16px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.10);
+    letter-spacing: 0.5px;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    outline: none;
+  }
+  .event-item .event-delete-btn:hover, .event-item .event-delete-btn:focus {
+    background: linear-gradient(90deg, #e74c3c 0%, #ff6a6a 100%);
+    box-shadow: 0 4px 16px rgba(231,76,60,0.18);
+    transform: translateY(-2px) scale(1.05);
+  }
+
+  /* ===== Fonts & Theme ===== */
+  @font-face {
+    font-family: "InterVar";
+    src: local("Inter"), local("InterVar"), local("Segoe UI");
+  }
+  :root{
+    --bg:#0b0f13;
+    --panel:#0f1720;
+    --muted:#94a3b8;
+    --accent:#5eead4;   /* mint accent */
+    --accent-2:#60a5fa; /* blue accent */
+    --card:#0b1220;
+    --glass: rgba(255,255,255,0.03);
+    --glass-2: rgba(255,255,255,0.02);
+    --success:#10b981;
+    --danger:#ef4444;
+    --shadow: 0 8px 24px rgba(2,6,23,0.7);
+    --radius:12px;
+    --glass-border: rgba(255,255,255,0.04);
+    --text: #e6eef7;
+  }
+
+  *{box-sizing:border-box}
+  html,body{
+    height:100%;margin:0;
+    font-family:InterVar,Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    color:var(--text);
+    background:radial-gradient(1200px 800px at 15% -10%, rgba(96,165,250,0.08), transparent 60%),
+               radial-gradient(900px 700px at 100% 0%, rgba(94,234,212,0.06), transparent 50%),
+               linear-gradient(180deg,var(--bg) 0%, #07101a 100%);
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
+  }
+
+  /* ===== LAYOUT ===== */
+  .app {
+    display:grid;
+    grid-template-columns: 260px 1fr;
+    gap:20px;
+    height:100vh;
+    padding:20px;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding:18px;
+    box-shadow: var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .brand {
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .brand .logo {
+    width:44px;height:44px;border-radius:10px;
+    background:conic-gradient(from 220deg, var(--accent), var(--accent-2), var(--accent));
+    display:grid;place-items:center;font-weight:700;color:#04121a;
+    box-shadow:0 6px 20px rgba(6,15,20,0.6);
+    position:relative;overflow:hidden;
+  }
+  .brand .logo::after{
+    content:""; position:absolute; inset:1px; border-radius:9px; 
+    background:linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02));
+    mix-blend:overlay;
+  }
+  .brand h1{font-size:16px;margin:0;letter-spacing:0.2px}
+  .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+  .search-small { margin-top:6px; }
+  .search-small input{
+    width:100%;padding:8px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:var(--text);
+  }
+
+  .nav {
+    display:flex;flex-direction:column;gap:6px;margin-top:8px;
+  }
+  .nav button {
+    display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition: all .22s;
+    text-align:left;font-weight:600;
+  }
+  .nav button svg{opacity:0.9}
+  .nav button:hover{transform:translateX(6px);color:var(--text);background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))}
+  .nav button.active{background:linear-gradient(90deg, rgba(94,234,212,0.06), rgba(96,165,250,0.03));color:var(--accent);box-shadow:inset 0 -1px 0 rgba(255,255,255,0.02)}
+
+  .side-footer{margin-top:auto;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--muted)}
+  .profile-mini{display:flex;gap:10px;align-items:center}
+  .profile-mini .avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#28334a,#1b2a36);display:grid;place-items:center;color:var(--accent);font-weight:700}
+
+  /* ===== MAIN PANEL ===== */
+  .panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding:20px;
+    box-shadow: var(--shadow);
+    height:100%;
+    overflow:auto;
+  }
+
+  .header {
+    display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;
+  }
+  .header .left h2{margin:0;font-size:18px}
+  .header .left p{margin:0;color:var(--muted);font-size:13px}
+  .top-actions{display:flex;gap:10px;align-items:center}
+
+  .search-box{display:flex;gap:8px;align-items:center;background:var(--glass);padding:8px;border-radius:999px;border:1px solid var(--glass-border)}
+  .search-box input{background:transparent;border:none;outline:none;color:var(--text);padding:8px;width:260px}
+  .btn {
+    padding:8px 12px;border-radius:10px;border:1px solid transparent;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#021018;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(6,20,20,0.4);
+  }
+  .btn.ghost{background:transparent;border:1px solid var(--glass-border);color:var(--text);box-shadow:none}
+  .btn.warn{background:linear-gradient(90deg,#fb923c,#ef4444);color:white}
+
+  /* ===== TOOL CONTENT ===== */
+  .tools {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap:14px;
+  }
+
+  .tool-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+    border-radius:12px;padding:14px;border:1px solid var(--glass-border);min-height:120px;transition:transform .18s, box-shadow .18s;
+  }
+  .tool-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,8,23,0.55)}
+
+  /* ===== TOOL PANES ===== */
+  .pane{display:none;animation: paneIn .28s ease both}
+  .pane.active{display:block}
+  @keyframes paneIn { from {opacity:0; transform:translateY(8px)} to {opacity:1; transform:none} }
+
+  /* Card list for library (small demo layout if you paste library) */
+  .card-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:12px; margin-top:12px; }
+  .book-card { background: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01)); padding:10px; border-radius:10px; border:1px solid var(--glass-border); display:flex; flex-direction:column; gap:8px; min-height:220px; }
+  .book-thumb { height:120px; border-radius:8px; background:linear-gradient(90deg,#071428, #102233); display:flex; align-items:center; justify-content:center; color:var(--muted); font-weight:700; font-size:13px; }
+  .book-title{font-weight:700}
+  .book-meta{font-size:12px;color:var(--muted)}
+
+  /* ===== FOOTER - MOBILE NAV ===== */
+  .mobile-nav {
+    display:none;
+    position:fixed;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:16px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(255,255,255,0.02));
+    border-radius:999px;padding:8px;border:1px solid var(--glass-border);
+    display:flex;gap:6px;box-shadow:0 10px 30px rgba(0,0,0,0.6);
+  }
+  .mobile-nav button{background:transparent;border:none;color:var(--muted);padding:10px;border-radius:8px;cursor:pointer}
+  .mobile-nav button.active{color:var(--accent);background:linear-gradient(90deg, rgba(94,234,212,0.06), rgba(96,165,250,0.04))}
+
+  /* ==== LIBRARY STYLES ==== */
+  #library { color: #fff; }
+  #searchBar {
+    width: 100%; padding: 10px; border: none; border-radius: 6px; margin-bottom: 15px;
+    background: #111827; color: #fff; outline: none;
+  }
+  .categories { display: flex; gap: 10px; margin-bottom: 15px; }
+  .cat-btn { background: #1f2937; border: none; padding: 8px 16px; border-radius: 6px; color: #fff; cursor: pointer; transition: 0.3s; }
+  .cat-btn.active, .cat-btn:hover { background: #10b981; }
+  .book-list { display: flex; flex-direction: column; gap: 12px; }
+  .book {
+    background: #1f2937; padding: 15px; border-radius: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .book h4 { margin: 0; }
+  .book a { color: #10b981; text-decoration: none; font-weight: bold; }
+  .book a:hover { text-decoration: underline; }
+
+  /* ==== TIME MANAGEMENT STYLES ==== */
+  #time { color: #fff; }
+  .task-input { display: flex; gap: 8px; margin-bottom: 15px; }
+  .task-input input {
+    flex: 1; padding: 10px; border-radius: 6px; border: none; background: #111827; color: #fff; outline: none;
+  }
+  .task-input button {
+    padding: 10px 16px; border: none; border-radius: 6px; background: #10b981; color: #fff; cursor: pointer; transition: 0.3s;
+  }
+  .task-input button:hover { background: #059669; }
+  #taskList { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  #taskList li { display: flex; justify-content: space-between; align-items: center; background: #1f2937; padding: 12px; border-radius: 8px; }
+  #taskList li.done .task-text { text-decoration: line-through; color: #6b7280; }
+  .task-buttons button { margin-left: 8px; padding: 5px 10px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+  .task-buttons .done-btn { background: #3b82f6; color: #fff; }
+  .task-buttons .done-btn:hover { background: #2563eb; }
+  .task-buttons .delete-btn { background: #ef4444; color: #fff; }
+  .task-buttons .delete-btn:hover { background: #b91c1c; }
+
+
+</style>
+</head>
+<body data-protected="true">
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" role="navigation" aria-label="Primary">
+    <div class="brand">
+      <div class="logo">J</div>
+      <div>
+        <h1>Jarwis</h1>
+        <p class="small">University Assistant</p>
+      </div>
+    </div>
+
+   <!-- ...existing code... -->
+<nav class="nav" id="nav">
+  <button class="active" data-target="home" aria-pressed="true">🏠 Dashboard</button>
+  <button data-target="library">📚 Library</button>
+  <button data-target="todo">✅ To-Do List</button>
+  <button data-target="timemanage">⏰ Scheduling</button>
+  <button data-target="pomodoro">⏳ Time Management</button>
+</nav>
+<!-- ...existing code... -->
+
+    <div class="side-footer">
+      <div class="profile-mini">
+        <div class="avatar">A</div>
+        <div>
+          <div style="font-weight:700"><span data-current-user-name></span></div>
+          <div style="color:var(--muted);font-size:12px"><span data-current-user-email></span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn ghost" onclick="goToProfile()">Profile</button>
+          <button class="btn ghost" onclick="logout()" title="Logout" data-logout>Logout</button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- MAIN PANEL -->
+  <main class="panel" role="main">
+    <div class="header">
+      <div class="left">
+        <h2 id="pageTitle">Dashboard</h2>
+        <p class="small" id="pageSub">Welcome to Jarwis — your campus assistant</p>
+      </div>
+
+     <!--  <div class="top-actions">
+        <button class="btn" onclick="openNewThing()">New</button>
+        <button class="btn ghost" onclick="showNotifications()">Notifications</button>
+      </div> -->
+    </div>
+
+    <!-- CONTENT PANES -->
+    <section id="home" class="pane active">
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:260px" class="tool-card">
+          <h3>Quick Overview</h3>
+          <p class="small">Jarwis demo with Library, Chatbot and Time Manager. Use the left menu to switch tools. Replace the placeholder blocks with your app modules.</p>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button data-target="library" class="btn" onclick="openPane('library')">Open Library</button>
+<!-- <button class="btn ghost" onclick="window.open('https://creator.voiceflow.com/share/68e78df7c008b9d6dab88f86/development', '_blank')">
+  Open Chat
+</button>
+ -->
+
+
+
+
+<script>
+function openPane(targetId) {
+  // Hide all panes
+  document.querySelectorAll('.pane').forEach(pane => pane.classList.remove('active'));
+
+  // Remove active class from all nav buttons
+  document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+
+  // Show the target pane
+  const pane = document.getElementById(targetId);
+  if (pane) pane.classList.add('active');
+
+  // Highlight the corresponding nav button
+  const btn = document.querySelector(`.nav button[data-target="${targetId}"]`);
+  if (btn) btn.classList.add('active');
+}
+</script>
+
+<!-- ====== Chat Bubble + Slide-up Voiceflow Panel ====== -->
+<style>
+  :root{
+    --jarvis-primary:#5865F2;         /* bubble color */
+    --jarvis-primary-2:#3b82f6;       /* gradient end */
+    --jarvis-bg:#0b0c10;              /* panel background */
+  }
+
+  /* Floating round button (bottom-right) */
+  #vfChatFab{
+    position:fixed; right:24px; bottom:24px;
+    width:60px; height:60px; border-radius:50%;
+    background:linear-gradient(135deg,var(--jarvis-primary),var(--jarvis-primary-2));
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:2147483000;
+    transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+  }
+  #vfChatFab:hover{ transform:scale(1.06); box-shadow:0 16px 40px rgba(0,0,0,.45); }
+  #vfChatFab:active{ transform:scale(.98); }
+
+  /* Simple “bot” logo mark */
+  #vfChatFab svg{ width:28px; height:28px; fill:#fff; }
+
+  /* Slide-up container */
+  #vfChatPanel{
+    position:fixed; right:24px; bottom:96px;   /* sits above the FAB */
+    width:420px; height:640px; max-height:75vh;
+    background:var(--jarvis-bg);
+    border-radius:18px; overflow:hidden;
+    box-shadow:0 18px 60px rgba(0,0,0,.5);
+    display:none; opacity:0; transform:translateY(16px);
+    transition:opacity .25s ease, transform .25s ease;
+    z-index:2147482999; will-change:transform,opacity;
+  }
+  #vfChatPanel.open{ display:block; opacity:1; transform:translateY(0); }
+
+  /* Panel header */
+  #vfChatHeader{
+    position:absolute; inset:0 0 auto 0; height:44px;
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 10px; color:#e7eaf6; font:500 14px/1.1 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    z-index:2;
+  }
+  #vfClose{
+    background:rgba(255,255,255,.14); border:none; color:#fff;
+    width:28px; height:28px; border-radius:8px; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    transition:background .2s ease, transform .1s ease;
+  }
+  #vfClose:hover{ background:rgba(255,255,255,.24); }
+  #vfClose:active{ transform:scale(.96); }
+
+  /* Iframe takes full space under header */
+  #vfFrame{ position:absolute; inset:44px 0 0 0; width:100%; height:calc(100% - 44px); border:0; }
+
+  /* Backdrop (optional: click outside to close) */
+  #vfBackdrop{
+    position:fixed; inset:0; background:transparent; display:none;
+    z-index:2147482998;
+  }
+  #vfBackdrop.show{ display:block; }
+
+  /* Mobile: make panel full width-ish */
+  @media (max-width:560px){
+    #vfChatPanel{ right:12px; left:12px; width:auto; height:70vh; bottom:96px; }
+    #vfChatFab{ right:16px; bottom:16px; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    #vfChatPanel{ transition:none; }
+    #vfChatFab{ transition:none; }
+  }
+</style>
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
+
+<!-- <div style="
+  background: #0b0c10;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+">
+  <iframe
+    src="https://creator.voiceflow.com/share/68e78df7c008b9d6dab88f86/development"
+    style="
+      width: 420px;
+      height: 680px;
+      border: none;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.4);
+    "
+  ></iframe>
+</div> -->
+
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <h4>Tools</h4>
+          <div class="tools">
+            <div style="padding:8px"><strong>Chatbot</strong><div class="small">Demo chat interface (non-AI placeholder)</div></div>
+            <div style="padding:8px"><strong>Library</strong><div class="small">Search & download PDFs</div></div>
+            <div style="padding:8px"><strong>To do List</strong><div class="small">Reminders</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px" class="tool-card">
+        <h4>Recent / Trending</h4>
+        <div class="card-grid">
+          <div style="padding:12px;border-radius:10px;background:var(--glass-2);border:1px solid var(--glass-border)">
+            <div style="font-weight:700">Most downloaded</div>
+            <div class="small" style="margin-top:6px">Python for Beginners — 120 downloads</div>
+          </div>
+          <div style="padding:12px;border-radius:10px;background:var(--glass-2);border:1px solid var(--glass-border)">
+            <div style="font-weight:700">Upcoming</div>
+            <div class="small" style="margin-top:6px">Midterms — next week</div>
+          </div>
+          <div style="padding:12px;border-radius:10px;background:var(--glass-2);border:1px solid var(--glass-border)">
+            <div style="font-weight:700">Notes</div>
+            <div class="small" style="margin-top:6px">You have 4 saved notes</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section id="chat" class="pane" aria-hidden="true">
+      <div style="display:flex;gap:14px;flex-direction:column">
+        <div id="chatSuggestions" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+        <div id="chatWindow" style="background:var(--glass);padding:12px;border-radius:10px;border:1px solid var(--glass-border);min-height:280px;display:flex;flex-direction:column;overflow-y:auto;max-height:320px;">
+          <!-- Messages will appear here -->
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <input id="chatInput" placeholder="Type your question..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:var(--text)"/>
+          <button class="btn" id="sendBtn">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="library" class="pane" aria-hidden="true">
+      <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
+        <select id="libCat" style="padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:var(--text)">
+          <option value="All">All categories</option>
+          <option>Languages</option>
+          <option>Mathematics</option>
+          <option>Programming</option>
+          <option>Romance</option>
+          <option>Motivational</option>
+        </select>
+        <button class="btn ghost" onclick="toggleFavView()">Favorites</button>
+      </div>
+
+      <div id="library" class="tool">
+        <h3>Digital Library</h3>
+
+        <!-- Search bar -->
+        <input type="text" id="searchBar" placeholder="Search for a book..." />
+
+        <!-- Category buttons -->
+        <div class="categories">
+          <button class="cat-btn active" data-category="all">All</button>
+          <button class="cat-btn" data-category="languages">Languages</button>
+          <button class="cat-btn" data-category="mathematics">Mathematics</button>
+          <button class="cat-btn" data-category="programming">Programming</button>
+          <button class="cat-btn" data-category="romance">Romance</button>
+          <button class="cat-btn" data-category="motivation">Motivational</button>
+        </div>
+
+        <!-- Book list -->
+        <div id="bookList" class="book-list">
+          <div class="book" data-category="programming">
+            <h4>Python for Scientists</h4>
+            <a href="pdfs/Python for Scientists (en).pdf" download>Download</a>
+          </div>
+          <div class="book" data-category="motivation">
+            <h4>Fantastic Future</h4>
+            <a href="pdfs/Elon_Musk_Tesla,_SpaceX,_and_the_Quest_for_a_Fantastic_Future_by.pdf (en).pdf" download>Download</a>
+          </div>
+          <div class="book" data-category="motivation">
+            <h4>Live Anywhere</h4>
+            <a href="pdfs/Ferriss,_Timothy_The_4_hour_workweek_escape_9_5,_live_anywhere,.pdf" download>Download</a>
+          </div>
+          <div class="book" data-category="motivation">
+            <h4>Inspire</h4>
+            <a href="pdfs/Start_With_Why_How_Great_Leaders_Inspire_Everyone_to_Take_Action.pdf" download>Download</a>
+          </div>
+          <div class="book" data-category="programming">
+            <h4>Python for Probability</h4>
+            <a href="pdfs/Python_for_Probability_Statistics_and_Machine_Learning.pdf (en).pdf" download>Download</a>
+          </div>
+          <div class="book" data-category="languages">
+            <h4>Grammer En Dialogue</h4>
+            <a href="pdfs/Grammaire_en_dialogues_debutant_pdf.pdf" download>Download</a>
+          </div>
+          <div class="book" data-category="languages">
+            <h4>Oxford English</h4>
+            <a href="pdfs/English file Oxford _250226_150016.pdf" download>Download</a>
+          </div>
+          <div class="book" data-category="mathematics">
+            <h4>Linear Algebra </h4>
+            <a href="pdfs/Geometry  Algebra (3) (1).pdf" download>Download</a>
+          </div>
+          <div class="book" data-category="mathematics">
+            <h4>Math7 </h4>
+            <a href="pdfs/Hanrahashiv_7_Nikolsky.pdf" download>Download</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="libraryContent" style="margin-top:12px">
+        <div class="card-grid" id="demoBooks">
+          <!-- demo cards (remove when you paste your real library) -->
+          <div class="book-card">
+            <div class="book-thumb">PY</div>
+            <div class="book-title">Python for Beginners</div>
+            <div class="book-meta">Author: Mike Johnson</div>
+            <div style="margin-top:auto;display:flex;gap:8px">
+              <a class="btn ghost" href="https://openlibrary.org/" onclick="alert('Download demo')">Download</a>
+              <button class="btn" onclick="favDemo(this)">☆ Fav</button>
+            </div>
+          </div>
+
+          <div class="book-card">
+            <div class="book-thumb">JS</div>
+            <div class="book-title">JavaScript Guide</div>
+            <div class="book-meta">Author: Linda White</div>
+            <div style="margin-top:auto;display:flex;gap:8px">
+              <a class="btn ghost" href="#" onclick="alert('Download demo')">Download</a>
+              <button class="btn" onclick="favDemo(this)">☆ Fav</button>
+            </div>
+          </div>
+
+          <div class="book-card">
+            <div class="book-thumb">MA</div>
+            <div class="book-title">Calculus I</div>
+            <div class="book-meta">Author: Robert Green</div>
+            <div style="margin-top:auto;display:flex;gap:8px">
+              <a class="btn ghost" href="#" onclick="alert('Download demo')">Download</a>
+              <button class="btn" onclick="favDemo(this)">☆ Fav</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TO-DO LIST -->
+    <section id="todo" class="pane" aria-hidden="true">
+      <div class="tool-card">
+        <div class="task-input">
+          <input type="text" id="newTask" placeholder="Enter a new task..." />
+          <button onclick="addTask()">Add</button>
+        </div>
+        <ul id="taskList"></ul>
+      </div>
+    </section>
+
+    <!-- TIME MANAGEMENT -->
+    <section id="timemanage" class="pane" aria-hidden="true">
+      <div class="tool-card">
+        <form id="eventForm" style="margin-bottom:12px" autocomplete="off" onsubmit="return false;">
+          <label for="eventTitle">Event Title:</label>
+          <input type="text" id="eventTitle" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--glass-border);background:transparent;color:var(--text);margin-bottom:8px" />
+          <label for="eventDate">Date & Time:</label>
+          <input type="datetime-local" id="eventDate" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--glass-border);background:transparent;color:var(--text);margin-bottom:8px" />
+          <button class="btn" id="addEventBtn" type="submit">Add Event</button>
+        </form>
+        <div id="calendarEvents"></div>
+      </div>
+
+      <div class="tool-card" style="margin-top:16px">
+        <h4>Calendar</h4>
+        <div id="calendarView" style="width:100%;max-width:400px;margin:auto"></div>
+      </div>
+    </section>
+
+
+    <section id="pomodoro" class="pane" aria-hidden="true">
+  <div class="pomodoro-center">
+    <div class="pomodoro-card">
+      <div class="header">
+        <div class="brand">
+          <span class="dot" style="background:var(--accent);width:12px;height:12px;display:inline-block;border-radius:50%;margin-right:8px"></span>
+          <span style="font-size:1.3em;font-weight:700;letter-spacing:0.5px">Pomo Pulse</span>
+        </div>
+        <div class="muted" id="date"></div>
+      </div>
+      <div class="timer">
+        <div class="mode-tabs" id="modes">
+          <button class="tab active" data-mode="work">Work</button>
+          <button class="tab" data-mode="short">Short break</button>
+          <button class="tab" data-mode="long">Long break</button>
+        </div>
+        <div class="time" id="time">25:00</div>
+        <div class="controls">
+          <button class="btn primary" id="start">Start</button>
+          <button class="btn" id="pause">Pause</button>
+          <button class="btn danger" id="reset">Reset</button>
+          <button class="btn" id="skip">Skip</button>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="row stats">
+        <div class="stat">
+          <span class="muted">Round</span>
+          <span class="value" id="round">1 / 4</span>
+        </div>
+        <div class="stat" style="flex:1">
+          <span class="muted">Session progress</span>
+          <div class="bar"><span id="progress"></span></div>
+        </div>
+        <div class="stat">
+          <span class="muted">Completed</span>
+          <span class="value" id="done">0</span>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="settings">
+        <div class="header">
+          <div style="font-weight:800">Quick Settings</div>
+          <div class="muted">autosave</div>
+        </div>
+        <div class="row"><label class="muted">Work (min)</label><input id="s-work" type="number" min="1" max="120" value="25" /></div>
+        <div class="row"><label class="muted">Short break (min)</label><input id="s-short" type="number" min="1" max="60" value="5" /></div>
+        <div class="row"><label class="muted">Long break (min)</label><input id="s-long" type="number" min="1" max="90" value="15" /></div>
+        <div class="row"><label class="muted">Rounds per cycle</label><input id="s-rounds" type="number" min="1" max="12" value="4" /></div>
+        <div class="row"><label class="muted">Sound</label><div class="switch" id="sound"><div class="knob"></div></div></div>
+        <div class="row"><label class="muted">Desktop notifications</label><div class="switch" id="notif"><div class="knob"></div></div></div>
+        <div class="sep"></div>
+        <div class="muted">Quick log</div>
+        <div class="list" id="log"></div>
+      </div>
+    </div>
+  </div>
+</section>
+  </main>
+
+
+  <!-- POMODORO TIME MANAGEMENT SECTION -->
+<!-- ...existing code... -->
+
+<style>
+/* Pomodoro Centering and Pro Look */
+#pomodoro .pomodoro-center {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#pomodoro .pomodoro-card {
+  background: linear-gradient(135deg, rgba(94,234,212,0.08) 0%, rgba(96,165,250,0.07) 100%);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(2,8,23,0.18);
+  padding: 36px 32px 28px 32px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  border: 1.5px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: paneIn .4s cubic-bezier(.4,1.6,.6,1) both;
+}
+#pomodoro .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+#pomodoro .timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+#pomodoro .mode-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0;
+}
+#pomodoro .mode-tabs .tab {
+  background: var(--glass);
+  border: none;
+  border-radius: 8px;
+  padding: 7px 18px;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+#pomodoro .mode-tabs .tab.active {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #04121a;
+  box-shadow: 0 2px 8px rgba(94,234,212,0.10);
+}
+#pomodoro .time {
+  font-size: 3.2em;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin: 10px 0 0 0;
+  text-shadow: 0 2px 12px rgba(94,234,212,0.10);
+}
+#pomodoro .controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0;
+}
+#pomodoro .controls .btn {
+  font-size: 1em;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+#pomodoro .controls .btn.danger {
+  background: linear-gradient(90deg, #ef4444, #fb7185);
+  color: #fff;
+}
+#pomodoro .sep {
+  height: 1px;
+  background: var(--glass-border);
+  margin: 12px 0;
+  border-radius: 2px;
+}
+#pomodoro .row.stats {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+#pomodoro .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 70px;
+}
+#pomodoro .stat .value {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+#pomodoro .bar {
+  width: 100%;
+  height: 8px;
+  background: var(--glass);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+#pomodoro #progress {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  width: 0;
+  border-radius: 6px;
+  transition: width .3s cubic-bezier(.4,1.6,.6,1);
+}
+#pomodoro .settings {
+  background: var(--glass-2);
+  border-radius: 12px;
+  padding: 16px 14px 10px 14px;
+  margin-top: 10px;
+  box-shadow: 0 2px 10px rgba(94,234,212,0.04);
+}
+#pomodoro .settings .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+#pomodoro .settings .row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+#pomodoro .settings label {
+  min-width: 120px;
+  color: var(--muted);
+  font-size: 1em;
+}
+#pomodoro .settings input[type="number"] {
+  width: 60px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1em;
+}
+#pomodoro .settings .switch {
+  width: 38px;
+  height: 22px;
+  background: var(--glass);
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  transition: background .18s;
+}
+#pomodoro .settings .switch.on {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+#pomodoro .settings .switch .knob {
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left .18s;
+  box-shadow: 0 2px 8px rgba(94,234,212,0.10);
+}
+#pomodoro .settings .switch.on .knob {
+  left: 18px;
+}
+#pomodoro .settings .muted {
+  font-size: 0.95em;
+}
+#pomodoro .list {
+  margin-top: 8px;
+  max-height: 90px;
+  overflow-y: auto;
+}
+#pomodoro .pill {
+  background: var(--glass);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.97em;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+@media (max-width: 600px) {
+  #pomodoro .pomodoro-card {
+    padding: 18px 6px 12px 6px;
+    max-width: 98vw;
+  }
+}
+/* --- Replace your #pomodoro .pomodoro-card CSS with this for a wider, more desktop look --- */
+#pomodoro .pomodoro-card {
+  background: linear-gradient(135deg, rgba(94,234,212,0.08) 0%, rgba(96,165,250,0.07) 100%);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(2,8,23,0.18);
+  padding: 36px 48px 32px 48px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  border: 1.5px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: paneIn .4s cubic-bezier(.4,1.6,.6,1) both;
+}
+@media (max-width: 1000px) {
+  #pomodoro .pomodoro-card {
+    max-width: 98vw;
+    padding: 18px 8px 12px 8px;
+    gap: 14px;
+  }
+}
+
+
+/* Center Pomodoro pane when active */
+#pomodoro.pane {
+  display: none;
+}
+#pomodoro.pane.active {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 0;
+}
+#pomodoro .pomodoro-center {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+<!-- ...existing code... -->
+<!-- Floating Action Button -->
+<!-- <div id="vfChatFab" aria-label="Open chat" title="Open chat">
+  
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 2a1 1 0 0 1 1 1v1.06A7.002 7.002 0 0 1 19 11v3a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6v-3a7.002 7.002 0 0 1 6-6.94V3a1 1 0 0 1 1-1Zm-5 9v3a4 4 0 0 0 4 4h2a4 4 0 0 0 4-4v-3a5 5 0 0 0-10 0Zm3.75 2.25a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Zm7 0a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Z"/>
+  </svg>
+</div> -->
+
+<!-- Slide-up panel + backdrop -->
+<div id="vfChatPanel" role="dialog" aria-modal="true" aria-label="Chat">
+  <div id="vfChatHeader">
+    <span style="display:flex;gap:8px;align-items:center">
+      <span style="width:8px;height:8px;border-radius:50%;background:#6ee7b7;display:inline-block;"></span>
+      JARVIS — Chat
+    </span>
+    <button id="vfClose" aria-label="Close">✕</button>
+  </div>
+  <iframe
+    id="vfFrame"
+    src="https://creator.voiceflow.com/share/68e78df7c008b9d6dab88f86/development"
+    allow="clipboard-write; microphone *"
+  ></iframe>
+</div>
+<div id="vfBackdrop"></div>
+
+
+
+<script>
+  (function(){
+    const fab = document.getElementById('vfChatFab');
+    const panel = document.getElementById('vfChatPanel');
+    const close = document.getElementById('vfClose');
+    const backdrop = document.getElementById('vfBackdrop');
+
+    function openChat(){
+      // ensure display before transition
+      panel.style.display = 'block';
+      requestAnimationFrame(()=> panel.classList.add('open'));
+      backdrop.classList.add('show');
+    }
+    function closeChat(){
+      panel.classList.remove('open');
+      backdrop.classList.remove('show');
+      // wait for fade-out to finish
+      setTimeout(()=>{ panel.style.display = 'none'; }, 260);
+    }
+
+    fab.addEventListener('click', openChat);
+    close.addEventListener('click', closeChat);
+    backdrop.addEventListener('click', closeChat);
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeChat(); });
+  })();
+</script>
+<!-- ====== /Chat Bubble + Panel ====== -->
+</div>
+
+<!-- Mobile bottom nav -->
+<div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Mobile">
+  <button data-target="home" class="active">🏠</button>
+  <button data-target="chat">🤖</button>
+  <button data-target="library">📚</button>
+  <button data-target="schedule">🕒</button>
+</div>
+
+
+
+
+<!-- remember remember remember remember remember remember remember remember remember remember -->
+<script type="text/javascript">
+  (function(d, t) {
+      var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+      v.onload = function() {
+        window.voiceflow.chat.load({
+          verify: { projectID: '683abb8e1e5229bfd26fd8db' },
+          url: 'https://general-runtime.voiceflow.com',
+          versionID: 'production',
+          voice: {
+            url: "https://runtime-api.voiceflow.com"
+          }
+        });
+      }
+      v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+  })(document, 'script');
+</script>
+<!-- remember remember remember remember remember remember remember remember remember remember -->
+
+
+
+
+<!-- Floating Support Assistant button -->
+<script>
+  // ===== Navigation & Tool Switching =====
+  const navBtns = document.querySelectorAll('.nav button');
+  const panes = document.querySelectorAll('.pane');
+  const pageTitle = document.getElementById('pageTitle');
+  const pageSub = document.getElementById('pageSub');
+
+  function setActive(target){
+    navBtns.forEach(b => {
+      const t = b.getAttribute('data-target');
+      b.classList.toggle('active', t === target);
+      b.setAttribute('aria-pressed', t === target ? 'true' : 'false');
+    });
+    document.querySelectorAll('.mobile-nav button').forEach(b=> b.classList.toggle('active', b.dataset.target === target));
+    panes.forEach(p => {
+      p.classList.toggle('active', p.id === target);
+      p.setAttribute('aria-hidden', p.id === target ? 'false' : 'true');
+    });
+  const titles = {
+  home: ['Dashboard','Welcome to Jarwis — your campus assistant'],
+  chat: ['Chatbot','Ask questions or chat with Jarwis'],
+  library: ['Library','Search & download course materials'],
+  todo: ['To-Do List','Reminders and tasks'],
+  timemanage: ['Scheduling','Schedule events and view calendar'],
+  pomodoro: ['Time Management','Pomodoro timer and focus sessions'],
+}
+    const t = titles[target] || ['Jarwis',''];
+    pageTitle.textContent = t[0];
+    pageSub.textContent = t[1];
+  }
+
+  navBtns.forEach(b => b.addEventListener('click', () => setActive(b.dataset.target)));
+  document.querySelectorAll('.mobile-nav button').forEach(b => b.addEventListener('click', ()=> setActive(b.dataset.target)));
+
+  // Guard: only add listeners if elements exist (avoid console errors)
+  const miniSearch = document.getElementById('miniSearch');
+  if (miniSearch){
+    miniSearch.addEventListener('keydown', (e)=>{
+      if(e.key !== 'Enter') return;
+      const q = e.target.value.trim();
+      if(!q) return;
+      setActive('library');
+      setTimeout(()=>{
+        const libSearch = document.getElementById('libSearch');
+        if (libSearch){ libSearch.value = q; filterDemoBooks(q); }
+      }, 120);
+    });
+  }
+  const globalQ = document.getElementById('globalQ');
+  if (globalQ){
+    globalQ.addEventListener('keydown', (e)=>{
+      if(e.key !== 'Enter') return;
+      const q = e.target.value.trim();
+      if(!q) return;
+      setActive('library');
+      setTimeout(()=>{
+        const libSearch = document.getElementById('libSearch');
+        if (libSearch){ libSearch.value = q; filterDemoBooks(q); }
+      }, 120);
+    });
+  }
+
+  function filterDemoBooks(q) {
+    q = (q || '').toLowerCase();
+    const cards = Array.from(document.querySelectorAll('#demoBooks .book-card'));
+    let found = false;
+    cards.forEach(card => {
+      const title = card.querySelector('.book-title').innerText.toLowerCase();
+      const meta = card.querySelector('.book-meta').innerText.toLowerCase();
+      const show = q === '' || title.includes(q) || meta.includes(q);
+      card.style.display = show ? '' : 'none';
+      if (show) found = true;
+    });
+    let noRes = document.getElementById('noResultsMsg');
+    if (!noRes) {
+      noRes = document.createElement('div');
+      noRes.id = 'noResultsMsg';
+      noRes.className = 'small';
+      noRes.style.margin = '24px 0';
+      noRes.style.textAlign = 'center';
+      noRes.style.color = 'var(--muted)';
+      noRes.textContent = 'No results found.';
+      const root = document.getElementById('demoBooks');
+      if (root) root.appendChild(noRes);
+    }
+    noRes.style.display = found ? 'none' : '';
+  }
+
+  const libCat = document.getElementById('libCat');
+  if (libCat){
+    libCat.addEventListener('change', () => {
+      alert('Category filter changed — integrate with your library code.');
+    });
+  }
+
+  function toggleFavView(){ alert('Favorites view: integrate with your library favorites storage (localStorage or DB).'); }
+  function favDemo(btn){ btn.innerText = btn.innerText === '☆ Fav' ? '★ Fav' : '☆ Fav'; }
+</script>
+
+<script>
+  // ==== LIBRARY SEARCH + CATEGORY FILTER (local) ====
+  const searchBar = document.getElementById('searchBar');
+  const books = document.querySelectorAll('#bookList .book');
+  if (searchBar){
+    searchBar.addEventListener('input', () => {
+      const searchValue = searchBar.value.toLowerCase();
+      books.forEach(book => {
+        const title = book.querySelector('h4').textContent.toLowerCase();
+        book.style.display = title.includes(searchValue) ? 'flex' : 'none';
+      });
+    });
+  }
+  const catButtons = document.querySelectorAll('.cat-btn');
+  catButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      catButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const category = btn.dataset.category;
+      books.forEach(book => {
+        if (category === 'all' || book.dataset.category === category) {
+          book.style.display = 'flex';
+        } else {
+          book.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  // ==== TIME MANAGEMENT LOGIC (events + calendar) ====
+  function addEvent() {
+    const title = document.getElementById('eventTitle').value.trim();
+    const date = document.getElementById('eventDate').value;
+    if (!title || !date) return;
+    let events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+    events.push({ title, date });
+    localStorage.setItem('calendarEvents', JSON.stringify(events));
+    document.getElementById('eventTitle').value = '';
+    document.getElementById('eventDate').value = '';
+    renderEvents();
+    renderCalendar();
+  }
+
+  function renderEvents() {
+    const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+    const container = document.getElementById('calendarEvents');
+    if (!container) return;
+    container.innerHTML = '';
+    events.forEach((ev, idx) => {
+      const div = document.createElement('div');
+      div.className = 'event-item';
+      div.style.display = 'flex';
+      div.style.justifyContent = 'space-between';
+      div.style.alignItems = 'center';
+      div.style.gap = '8px';
+      div.style.padding = '10px';
+      div.style.border = '1px solid var(--glass-border)';
+      div.style.borderRadius = '10px';
+      div.style.marginBottom = '8px';
+      div.style.background = 'var(--glass)';
+      div.innerHTML = `<span class="event-title" style="font-weight:600">${ev.title}</span>
+                       <span class="event-date" style="color:var(--muted);font-size:0.95em">${new Date(ev.date).toLocaleString()}</span>
+                       <button class="event-delete-btn" type="button">Delete</button>`;
+      div.querySelector('.event-delete-btn').onclick = () => {
+        let events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+        events.splice(idx, 1);
+        localStorage.setItem('calendarEvents', JSON.stringify(events));
+        renderEvents();
+        renderCalendar();
+      };
+      container.appendChild(div);
+    });
+  }
+
+  function renderCalendar() {
+    const events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+    const calendar = document.getElementById('calendarView');
+    if (!calendar) return;
+    if (!window._calendarState) {
+      window._calendarState = { month: (new Date()).getMonth(), year: (new Date()).getFullYear() };
+    }
+    const { month, year } = window._calendarState;
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+
+    let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <button class="btn ghost" style="padding:4px 10px;font-size:1em" onclick="calendarPrevMonth()">&#8592;</button>
+      <span style="font-weight:600;font-size:1.1em">${firstDay.toLocaleString('en', { month: 'long' })} ${year}</span>
+      <button class="btn ghost" style="padding:4px 10px;font-size:1em" onclick="calendarNextMonth()">&#8594;</button>
+    </div>`;
+
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-weight:500;color:var(--muted);margin-bottom:4px">';
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => html += `<div>${d}</div>`);
+    html += '</div>';
+
+    html += '<div id="calendarDaysGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">';
+    let dayOfWeek = firstDay.getDay();
+    for (let i = 0; i < dayOfWeek; i++) html += '<div></div>';
+
+    let selectedDay = window._calendarState.selectedDay;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayEvents = events.filter(ev => {
+        const evDate = new Date(ev.date);
+        return evDate.getFullYear() === year && evDate.getMonth() === month && evDate.getDate() === day;
+      });
+      const isSelected = selectedDay && selectedDay.year === year && selectedDay.month === month && selectedDay.day === day;
+      html += `<div class="calendar-day${isSelected ? ' selected' : ''}"
+                 style="min-height:48px;padding:4px;border-radius:8px;background:${isSelected ? 'var(--accent)' : (dayEvents.length ? 'rgba(94,234,212,0.10)' : 'transparent')};border:1px solid ${isSelected ? 'var(--accent-2)' : (dayEvents.length ? 'var(--accent)' : 'var(--glass-border)')};position:relative;cursor:pointer;"
+                 onclick="calendarSelectDay(${year},${month},${day})">
+                 <div style="font-size:0.95em;font-weight:600;color:${isSelected ? '#04121a' : ''}">${day}</div>`;
+      if (dayEvents.length) {
+        dayEvents.forEach(ev => {
+          html += `<div style="background:var(--accent);color:#04121a;border-radius:6px;padding:2px 6px;margin:2px 0;font-size:0.9em;box-shadow:0 1px 4px rgba(94,234,212,0.10)"><strong>${ev.title}</strong></div>`;
+        });
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+
+    if (selectedDay) {
+      const selEvents = events.filter(ev => {
+        const evDate = new Date(ev.date);
+        return evDate.getFullYear() === selectedDay.year && evDate.getMonth() === selectedDay.month && evDate.getDate() === selectedDay.day;
+      });
+      html += `<div id="selectedDayEvents" style="margin-top:16px;padding:12px;border-radius:10px;background:var(--glass);border:1px solid var(--glass-border)">`;
+      html += `<div style="font-weight:600;font-size:1.1em;margin-bottom:8px">${selectedDay.day} ${firstDay.toLocaleString('en', { month: 'long' })} ${selectedDay.year}</div>`;
+      if (selEvents.length) {
+        selEvents.forEach(ev => {
+          html += `<div style="margin-bottom:8px"><strong>${ev.title}</strong><br><span style="color:var(--muted)">${new Date(ev.date).toLocaleString('en')}</span></div>`;
+        });
+      } else {
+        html += `<div style="color:var(--muted)">No events for this day.</div>`;
+      }
+      html += '</div>';
+    }
+    calendar.innerHTML = html;
+  }
+
+  function calendarSelectDay(year, month, day) {
+    window._calendarState = window._calendarState || {};
+    window._calendarState.selectedDay = { year, month, day };
+    renderCalendar();
+  }
+  function calendarPrevMonth() {
+    if (!window._calendarState) return;
+    window._calendarState.month--;
+    if (window._calendarState.month < 0) {
+      window._calendarState.month = 11;
+      window._calendarState.year--;
+    }
+    renderCalendar();
+  }
+  function calendarNextMonth() {
+    if (!window._calendarState) return;
+    window._calendarState.month++;
+    if (window._calendarState.month > 11) {
+      window._calendarState.month = 0;
+      window._calendarState.year++;
+    }
+    renderCalendar();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // To-Do (localStorage)
+    const taskInput = document.getElementById('newTask');
+    const taskList = document.getElementById('taskList');
+    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    tasks.forEach(t => renderTask(t.text, t.done));
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (text === '') return;
+      renderTask(text, false);
+      tasks.push({ text, done: false });
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      taskInput.value = '';
+    }
+    window.addTask = addTask;
+
+    function renderTask(text, done) {
+      const li = document.createElement('li');
+      if (done) li.classList.add('done');
+      li.innerHTML = `
+        <span class="task-text">${text}</span>
+        <div class="task-buttons">
+          <button class="done-btn">${done ? 'Undo' : 'Done'}</button>
+          <button class="delete-btn">Delete</button>
+        </div>
+      `;
+      const doneBtn = li.querySelector('.done-btn');
+      const deleteBtn = li.querySelector('.delete-btn');
+      doneBtn.addEventListener('click', () => { li.classList.toggle('done'); updateTasks(); });
+      deleteBtn.addEventListener('click', () => { li.remove(); updateTasks(); });
+      taskList.appendChild(li);
+    }
+
+    function updateTasks() {
+      tasks = [];
+      document.querySelectorAll('#taskList li').forEach(li => {
+        tasks.push({
+          text: li.querySelector('.task-text').textContent,
+          done: li.classList.contains('done')
+        });
+      });
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Events
+    renderEvents();
+    renderCalendar();
+    const eventForm = document.getElementById('eventForm');
+    if (eventForm) eventForm.addEventListener('submit', addEvent);
+  });
+</script>
+
+<script>
+  // ==== Simple Chat Demo ====
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatSuggestions = document.getElementById('chatSuggestions');
+    const exampleQuestions = [
+      "What is Jarwis?","Who created Jarwis?","How do I download resources?","How do I add an assignment?","Can I preview PDFs?",
+      "How do I contact support?","How do I reset my password?","Is there a mobile app?","How do I favorite a book?","Can I share notes?",
+      "How do I change my profile picture?","How do I get notifications?","Can I chat with other students?","How do I see my grades?",
+      "How do I add events to my calendar?","Is my data secure?","How do I log out?"
+    ];
+    const chatWindow = document.getElementById('chatWindow');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    exampleQuestions.forEach(q => {
+      const btn = document.createElement('button');
+      btn.textContent = q;
+      btn.className = 'btn ghost';
+      btn.style.fontSize = '13px';
+      btn.style.padding = '6px 10px';
+      btn.onclick = () => {
+        chatInput.value = q;
+        chatInput.focus();
+      };
+      chatSuggestions.appendChild(btn);
+    });
+
+    const qa = {
+      "what is jarwis?": "Jarwis is your university assistant web app.",
+      "who created jarwis?": "Jarwis was created by a student team for campus support.",
+      "how do i download resources?": "Go to the Resources section and click the download link.",
+      "how do i add an assignment?": "Use the Assignments section and fill in the title and date.",
+      "can i preview pdfs?": "Currently, you can only download PDFs. Preview is coming soon.",
+      "how do i contact support?": "Use the floating Support button (bottom-right) or email support@jarwis.demo.",
+      "how do i reset my password?": "Password reset is available in your profile settings.",
+      "is there a mobile app?": "Jarwis is mobile-friendly in your browser. Native app is planned.",
+      "how do i favorite a book?": "Click the ☆ Fav button on any book in the Library.",
+      "can i share notes?": "Notes sharing will be available in a future update.",
+      "how do i change my profile picture?": "Profile picture editing is coming soon.",
+      "how do i get notifications?": "Enable browser notifications in your profile settings.",
+      "can i chat with other students?": "Group chat is planned for a future release.",
+      "how do i see my grades?": "Grade tracking will be added soon.",
+      "how do i add events to my calendar?": "Use the Time Manager to add events and reminders.",
+      "is my data secure?": "Your data is stored securely and never shared.",
+      "how do i log out?": "Click the Logout button in the sidebar."
+    };
+
+    function addMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = 'chat-msg ' + sender;
+      msg.textContent = text;
+      msg.style.opacity = 0;
+      msg.style.transform = 'translateY(10px)';
+      chatWindow.appendChild(msg);
+      setTimeout(() => {
+        msg.style.transition = 'opacity 0.4s, transform 0.4s';
+        msg.style.opacity = 1;
+        msg.style.transform = 'translateY(0)';
+      }, 50);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function getAnswer(q) {
+      const key = q.trim().toLowerCase();
+      return qa[key] || "Sorry, I don't know the answer to that yet.";
+    }
+
+    sendBtn.onclick = () => {
+      const userText = chatInput.value.trim();
+      if (!userText) return;
+      addMessage(userText, 'user');
+      setTimeout(() => { addMessage(getAnswer(userText), 'bot'); }, 400);
+      chatInput.value = '';
+    };
+
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
+
+    // Basic chat message styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .chat-msg { margin:8px 0; padding:8px 12px; border-radius:8px; max-width:80%; word-break:break-word; }
+      .chat-msg.user { background:var(--accent-2); color:#fff; align-self:flex-end; }
+      .chat-msg.bot { background:var(--glass); color:var(--text); align-self:flex-start; }
+      #chatWindow { display:flex; flex-direction:column; }
+    `;
+    document.head.appendChild(style);
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="auth.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+(function(){
+  const $ = (s, r=document)=>r.querySelector(s);
+  const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
+  const pad = (n)=>String(n).padStart(2,'0');
+
+  // Shared AudioContext helpers
+  let _audioCtx = null;
+  function getAudioCtx() {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return _audioCtx;
+  }
+  function ensureAudioUnlocked() {
+    const ctx = getAudioCtx();
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{});
+  }
+
+  function beep(ms = 250, freq = 1046, type = 'triangle', volume = 0.18) {
+    try {
+      const ctx = getAudioCtx();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type; o.frequency.value = freq;
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(volume, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + ms/1000);
+      o.start();
+      setTimeout(()=>{ try{o.stop();}catch(e){} }, ms+20);
+    } catch(e) {}
+  }
+
+  // play N short ticks in sequence using one AudioContext (default 25)
+  function playTicks(count = 25, intervalMs = 140, tickMs = 36, freq = 1500, type = 'square', volume = 0.16) {
+    try {
+      const ctx = getAudioCtx();
+      let i = 0;
+      const playOne = () => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = type; o.frequency.value = freq;
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(volume, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + tickMs/1000);
+        o.start();
+        setTimeout(()=>{ try{o.stop();}catch(e){} }, tickMs+10);
+        i++;
+        if (i < count) setTimeout(playOne, intervalMs);
+      };
+      playOne();
+    } catch(e) {}
+  }
+
+  const state = {
+    mode:'work', remaining:25*60, rounds:4, currentRound:1,
+    running:false, startedAt:null, tickId:null, sound:true, notif:false, totals:0
+  };
+
+  const elTime=$('#pomodoro #time'),
+        elRound=$('#pomodoro #round'),
+        elDone=$('#pomodoro #done'),
+        elProg=$('#pomodoro #progress'),
+        elLog=$('#pomodoro #log');
+  const inputWork=$('#pomodoro #s-work'),
+        inputShort=$('#pomodoro #s-short'),
+        inputLong=$('#pomodoro #s-long'),
+        inputRounds=$('#pomodoro #s-rounds');
+  const swSound=$('#pomodoro #sound'),
+        swNotif=$('#pomodoro #notif');
+
+  function minutesFor(mode){
+    if(mode==='work') return Math.max(1,+inputWork.value||25)*60;
+    if(mode==='short')return Math.max(1,+inputShort.value||5)*60;
+    return Math.max(1,+inputLong.value||15)*60;
+  }
+
+  function setMode(mode){
+    state.mode=mode;
+    state.remaining=minutesFor(mode);
+    updateUI();
+  }
+
+  function updateUI(){
+    if (!elTime) return;
+    const m=Math.floor(state.remaining/60), s=state.remaining%60;
+    elTime.textContent=`${pad(m)}:${pad(s)}`;
+    elRound.textContent=`${state.currentRound} / ${state.rounds}`;
+    elDone.textContent=state.totals;
+    $$('#pomodoro #modes .tab').forEach(b=>b.classList.toggle('active', b.dataset.mode===state.mode));
+    const totalWorkSec = minutesFor('work') * state.rounds;
+    let done = (state.currentRound-1)*minutesFor('work');
+    if(state.mode==='work') done += (minutesFor('work')-state.remaining);
+    if (elProg) elProg.style.width = Math.max(0, Math.min(100, 100*done/totalWorkSec)) + '%';
+  }
+
+  function log(msg){
+    if (!elLog) return;
+    const el=document.createElement('div');
+    el.className='pill';
+    el.textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + ' — ' + msg;
+    elLog.prepend(el);
+    while(elLog.children.length>12) elLog.removeChild(elLog.lastChild);
+  }
+
+  // onFinish plays one tone then 25 ticks
+  function onFinish(){
+    if(state.sound){
+      ensureAudioUnlocked();
+      beep(180, 1046, 'triangle', 0.18);
+      setTimeout(()=>{ playTicks(25, 140, 36, 1500, 'square', 0.16); }, 200);
+    }
+    log(`⏰ ${state.mode==='work'?'Work':'Break'} finished`);
+  }
+
+  function advance(){
+    onFinish();
+    if(state.mode==='work'){
+      state.totals++;
+      if(state.currentRound>=state.rounds){ state.currentRound=1; setMode('long'); }
+      else { state.currentRound++; setMode('short'); }
+    }else{ setMode('work'); }
+    pause();
+  }
+
+  function tick(){
+    if(!state.running) return;
+    const now = Date.now();
+    state.remaining = Math.max(0, Math.round((state.endAt - now) / 1000));
+    updateUI();
+    if(state.remaining <= 0){
+      advance();
+    }
+  }
+
+  function start(){
+    if(state.running) return;
+    state.running = true;
+    state.endAt = Date.now() + state.remaining * 1000;
+    state.tickId = setInterval(tick, 200);
+    log(`▶️ Started ${state.mode}`);
+  }
+
+  function pause(){
+    if(!state.running) return;
+    state.running = false;
+    clearInterval(state.tickId);
+    state.remaining = Math.max(0, Math.round((state.endAt - Date.now()) / 1000));
+    log('⏸️ Paused');
+  }
+
+  function reset(){
+    pause(); state.remaining=minutesFor(state.mode); updateUI(); log('🔄 Reset');
+  }
+
+  function skip(){
+    pause(); state.remaining=0; updateUI(); advance();
+  }
+
+  if ($('#pomodoro')) {
+    // Start button must resume audio context first (user gesture)
+    const startBtn = $('#pomodoro #start');
+    if (startBtn) {
+      startBtn.addEventListener('click', ()=>{
+        ensureAudioUnlocked();
+        start();
+      });
+    }
+    $('#pomodoro #pause').onclick=pause;
+    $('#pomodoro #reset').onclick=reset;
+    $('#pomodoro #skip').onclick=skip;
+    $$('#pomodoro #modes .tab').forEach(btn=>btn.onclick=()=>setMode(btn.dataset.mode));
+    if (inputWork) inputWork.onchange=()=>{ if(state.mode==='work') reset(); };
+    if (inputShort) inputShort.onchange=()=>{ if(state.mode==='short') reset(); };
+    if (inputLong) inputLong.onchange=()=>{ if(state.mode==='long') reset(); };
+    if (inputRounds) inputRounds.onchange=()=>{ state.rounds=Math.max(1,+inputRounds.value||4); updateUI(); };
+    if (swSound) swSound.onclick=()=>{ state.sound=!state.sound; swSound.classList.toggle('on', state.sound); };
+    if (swNotif) swNotif.onclick=()=>{ state.notif=!state.notif; swNotif.classList.toggle('on', state.notif); };
+    $('#pomodoro #date').textContent=new Date().toLocaleDateString([], {weekday:'long', month:'short', day:'numeric'});
+    updateUI();
+  }
+})();
+
+
+// Sound switch wiring (for the HTML: <div class="switch" id="sound"><div class="knob"></div></div>)
+const swSound = document.querySelector('#pomodoro #sound');
+if (swSound) {
+  const toggleSound = ()=>{
+    state.sound = !state.sound;
+    swSound.classList.toggle('on', state.sound);
+    swSound.setAttribute('aria-checked', state.sound ? 'true' : 'false');
+  };
+  swSound.addEventListener('click', toggleSound);
+  swSound.addEventListener('keydown', (e)=>{ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggleSound(); } });
+  swSound.classList.toggle('on', state.sound);
+  swSound.setAttribute('aria-checked', state.sound ? 'true' : 'false');
+}
+
+</script>
+
+
+
+</body>
+</html>
