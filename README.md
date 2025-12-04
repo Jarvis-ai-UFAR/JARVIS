@@ -8,21 +8,28 @@ Currently, JARVIS focuses on:
 - Secure user accounts (students and admins)
 - A digital library of books
 - Personalisation via favourite books
+- **AI assistant features for students (study help and guidance)**
 - A clean, student-friendly interface
+
+The main authenticated interface is a **single-page dashboard** (`jarwis.html`):  
+when the user clicks items in the navbar, **only the visible section changes** via JavaScript  
+(the browser does not load a new HTML file).
 
 ---
 
 ## 1. Features
 
 - User registration and login
-- Profile page with basic account info
+- Profile page / section with basic account info
 - Password change for logged-in users
 - Role-based access (student / admin)
 - Digital library of books
 - Mark / unmark books as favourites
+- **AI assistant for students (chat-based help for studying and navigation)**
+- Single-page dashboard where navigation only switches sections
 - Admin pages for managing users and books
 
-(Future features: full student dashboard with to-do list, schedule, Pomodoro, and AI assistant.)
+(Future improvements: full student dashboard with to-do list, schedule, advanced Pomodoro, and smarter AI assistant.)
 
 ---
 
@@ -32,6 +39,7 @@ Currently, JARVIS focuses on:
 - **Frontend:** HTML, CSS, JavaScript
 - **Database:** SQLite (development), can be upgraded to PostgreSQL in production
 - **Architecture pattern:** MVC-style (Django MVT mapped to MVC)
+- **Frontend navigation:** single-page dashboard (`jarwis.html`) with section switching via JS
 
 ---
 
@@ -84,15 +92,16 @@ Although Django uses **MVT (Model–View–Template)**, we describe the architec
   - Allows a logged-in user to change their password.
 
 - `ProfileView`
-  - Displays and updates basic user profile data.
+  - Displays and updates basic user profile data
+  - In the UI, profile can be a separate page or a section inside `jarwis.html`.
 
 #### Library / Book Controllers
 
 - `BookListView`
-  - Lists all available books for students.
+  - Provides data for the books section in the dashboard.
 
 - `BookDetailView`
-  - Shows details of a single book.
+  - Shows details of a single book (or returns data for a detail view/modal).
 
 - `FavoriteBookToggleView`
   - Adds or removes a book from the current user’s favourites.
@@ -103,7 +112,7 @@ Although Django uses **MVT (Model–View–Template)**, we describe the architec
 #### Admin Controllers
 
 - `AdminDashboardView`
-  - Main admin homepage.
+  - Main admin homepage (served by `admin.html`).
 
 - `AdminUserListView`
   - Lists all users, with options to view or manage them.
@@ -124,42 +133,41 @@ Although Django uses **MVT (Model–View–Template)**, we describe the architec
 
 ### 3.3 Views (V) – Templates
 
-**User-facing templates**
-
-- `base.html`
-  - Base layout (navbar, footer, shared structure).
-
-- `register.html`
-  - Registration form.
+**Public / Auth templates**
 
 - `login.html`
-  - Login form.
+  - Login form page.
 
-- `profile.html`
-  - User profile information and password change link/section.
+- `register.html`
+  - Registration form page.
 
-- `books.html`
-  - Main digital library page showing list of books.
+- `base.html`
+  - Base layout that other templates can extend (navbar, footer, etc., if used).
 
-- `book_detail.html`
-  - Detailed page for a single book.
+**Main student dashboard (single-page)**
 
-- `favorites.html`
-  - List of the current user’s favourite books.
+- `jarwis.html`
+  - Main authenticated dashboard.
+  - Contains multiple **sections**: library, favourites, AI assistant, etc.
+  - The navbar switches visible sections using JavaScript (single-page behaviour, not full-page reloads).
+
+**Optional / extra templates**
+
+- `profile.html` (if implemented as a separate page instead of a section)
+  - User profile information and password change area.
 
 **Admin templates**
 
-- `admin/dashboard.html`
-  - Overview page for admin actions.
+- `admin.html`
+  - Main admin interface layout (navbar + sections or links).
 
-- `admin/users.html`
-  - User management page (list, delete, change role).
+- Possible sub-templates:
+  - `admin/dashboard.html`
+  - `admin/users.html`
+  - `admin/books.html`
+  - `admin/book_form.html`
 
-- `admin/books.html`
-  - Manage books (list view).
-
-- `admin/book_form.html`
-  - Form used for creating or updating books.
+(Depending on implementation, admin can also use a single-page pattern similar to `jarwis.html`.)
 
 ---
 
@@ -169,14 +177,16 @@ Although Django uses **MVT (Model–View–Template)**, we describe the architec
 
 - Register and log in
 - View and update their profile
+- Access the single-page dashboard (`jarwis.html`)
 - Browse the book library
 - Mark / unmark favourite books
 - View their list of favourites
+- **Use the AI assistant for study support**
 
 ### Admin
 
 - All student permissions
-- Access the admin dashboard
+- Access the admin interface (`admin.html`)
 - Manage users (view, delete/deactivate, change role)
 - Manage books (create, edit, delete)
 
@@ -187,21 +197,15 @@ Although Django uses **MVT (Model–View–Template)**, we describe the architec
 ```text
 jarvis/
 ├─ manage.py
-├─ jarvis/               # Django project settings
-├─ accounts/             # Auth & profile (controllers + models)
-├─ library/              # Book and favourites logic
+├─ jarvis/                # Django project settings
+├─ accounts/              # Auth & profile (controllers + models)
+├─ library/               # Book and favourites logic
 ├─ templates/
 │  ├─ base.html
-│  ├─ register.html
 │  ├─ login.html
-│  ├─ profile.html
-│  ├─ books.html
-│  ├─ book_detail.html
-│  ├─ favorites.html
-│  └─ admin/
-│     ├─ dashboard.html
-│     ├─ users.html
-│     ├─ books.html
-│     └─ book_form.html
-├─ static/               # CSS / JS / images
+│  ├─ register.html
+│  ├─ jarwis.html         # main single-page student dashboard
+│  ├─ profile.html        # (optional separate profile page)
+│  └─ admin.html          # main admin interface (with sections or sub-templates)
+├─ static/                # CSS / JS / images
 └─ requirements.txt
