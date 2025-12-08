@@ -41,7 +41,7 @@ Its goal is to help students manage learning resources and improve their study w
 |------|------------|
 | Backend | **Django (Python)** |
 | Frontend | HTML, CSS, JavaScript |
-| Database | SQLite (dev) / PostgreSQL (prod) |
+| Database | SQLite (dev) |
 | Architecture | MVC-style (mapped from Django MVT) |
 | Security | HTTPS, secure cookies, private server tokens |
 
