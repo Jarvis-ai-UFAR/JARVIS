@@ -110,7 +110,7 @@ but the project is documented in **MVC terms** as well for clarity.
 ### Public Templates
 - `login.html`  
 - `register.html`  
-- `base.html`
+- `jarwis.html`
 
 ### Student Dashboard
 - `jarwis.html`  
