@@ -322,8 +322,15 @@ MIT or your chosen license.
 
 # 🙌 Acknowledgements
 - Django Framework  
-- Voicflow API  
-- Bootstrap / Frontend libraries  
-- UFAR – Student research project
+- Django REST Framework  
+- Voiceflow – conversational flow prototyping  
+- OpenAI / ChatGPT – AI assistance for design and development  
+- Bootstrap and other frontend CSS/JS libraries  
+- Font Awesome and icon libraries used in the UI  
+- MDN Web Docs and official Django documentation  
+- Git and GitHub – version control and collaboration  
+- GitHub Pages – hosting of the current frontend prototype  
+- UFAR – Student research and development support  
+
 
 
