@@ -56,72 +56,152 @@ but the project is documented in **MVC terms** as well for clarity.
 
 ## 1️⃣ Models (M)
 
-### User
+### User  
+(Extends Django’s built-in `User` via a custom user model or profile)  
 - `id` *(Primary Key)*  
 - `username`  
 - `email`  
-- `password` *(hashed)*  
-- `role` (**student / admin**)
+- `password` *(hashed, managed by Django)*  
+- `role` (**student / admin**)  
+- `is_active`  
+- `date_joined`  
 
-### Book
+### Book  
 - `id` *(Primary Key)*  
 - `title`  
 - `author`  
 - `category`  
 - `description`  
-- `file_url`  
-- `is_active`
+- `file_url` *(link to PDF / external resource)*  
+- `is_active` *(controls visibility in the library)*  
 
-### FavoriteBook
+### FavoriteBook  
 - `id` *(Primary Key)*  
-- `user` (FK → User)  
-- `book` (FK → Book)  
-- `added_at`
+- `user` *(FK → User)*  
+- `book` *(FK → Book)*  
+- `added_at`  
+
+### Task (To-Do / Planner)  
+- `id` *(Primary Key)*  
+- `user` *(FK → User)*  
+- `title`  
+- `description` *(optional)*  
+- `status` **(pending / in_progress / done)**  
+- `priority` **(low / normal / high)**  
+- `due_datetime` *(optional)*  
+- `created_at`  
+- `updated_at`  
+
+### Event (Schedule / Calendar)  
+- `id` *(Primary Key)*  
+- `user` *(FK → User)*  
+- `title`  
+- `description` *(optional)*  
+- `start_datetime`  
+- `end_datetime` *(optional)*  
+- `location` *(optional)*  
+- `is_all_day` *(boolean)*  
+- `repeat` *(optional: **none / daily / weekly / monthly**)*  
+
+### AIConversation  
+- `id` *(Primary Key)*  
+- `user` *(FK → User)*  
+- `title` *(optional, e.g. “Algebra revision”)*  
+- `created_at`  
+- `updated_at`  
+
+### AIMessage  
+- `id` *(Primary Key)*  
+- `conversation` *(FK → AIConversation)*  
+- `sender` **(user / assistant)**  
+- `content` *(message text)*  
+- `created_at`  
+
 
 ---
 
-## 2️⃣ Controllers (C) – Django Views
+## 2️⃣ Controllers (C) – Django Views / APIs
 
-### Authentication
-- `RegisterView`  
-- `LoginView`  
-- `LogoutView`  
-- `ChangePasswordView`  
-- `ProfileView`
+### Authentication & Profile  
+- `RegisterView` – create new student/admin accounts  
+- `LoginView` – user login  
+- `LogoutView` – user logout  
+- `ChangePasswordView` – password change for logged-in users  
+- `ProfileView` – view current user profile  
+- `ProfileUpdateView` – update profile details  
 
-### Library
-- `BookListView`  
-- `BookDetailView`  
-- `FavoriteBookToggleView`  
-- `FavoriteListView`
+### Library  
+- `BookListView` – list of active books (HTML / JSON)  
+- `BookDetailView` – view single book details  
+- `FavoriteBookToggleView` – add/remove book from favourites  
+- `FavoriteListView` – list of user’s favourite books  
 
-### Admin
-- `AdminDashboardView`  
-- `AdminUserListView`  
-- `AdminUserDeleteView`  
-- `AdminBookCreateView`  
-- `AdminBookUpdateView`  
-- `AdminBookDeleteView`
+### Tasks (To-Do List)  
+- `TaskListView` – list tasks for current user  
+- `TaskCreateView` – create a new task  
+- `TaskUpdateView` – edit task (title, status, priority)  
+- `TaskDeleteView` – delete task  
+- `TaskListAPI` – JSON API endpoint for tasks (used by JS in dashboard)  
+
+### Schedule (Events / Calendar)  
+- `EventListView` – list events for current user  
+- `EventCreateView` – create new event  
+- `EventUpdateView` – edit event (time, description, repeat)  
+- `EventDeleteView` – delete event  
+- `EventListAPI` – JSON API endpoint for calendar events  
+
+### AI Assistant  
+- `AIChatPageView` – renders AI chat section inside `jarwis.html`  
+- `AIChatAPIView` – REST endpoint: receives a prompt and returns AI response (JSON)  
+- `AIConversationListView` – list previous AI conversations (optional)  
+- `AIConversationDetailView` – load a specific conversation history (optional)  
+
+### Dashboard / SPA Wrapper  
+- `DashboardView` – renders `jarwis.html` for logged-in students  
+  - Provides initial data (user info, some tasks/events/books)  
+  - Frontend JavaScript calls REST APIs for live updates  
+
+### Admin  
+- `AdminDashboardView` – admin overview  
+- `AdminUserListView` – list all users  
+- `AdminUserDetailView` – inspect a user (profile, activity)  
+- `AdminUserDeactivateView` / `AdminUserDeleteView` – deactivate or delete accounts  
+- `AdminBookCreateView` – add a new book to the library  
+- `AdminBookUpdateView` – edit existing book  
+- `AdminBookDeleteView` – delete/deactivate book  
+- `AdminTaskListView` – optional: view tasks across users  
+- `AdminEventListView` – optional: view events across users  
+
 
 ---
 
 ## 3️⃣ Views (V) – Templates
 
-### Public Templates
-- `login.html`  
-- `register.html`  
-- `jarwis.html`
+### Public Templates  
+- `login.html` – login form  
+- `register.html` – registration form  
 
-### Student Dashboard
-- `jarwis.html`  
-  - Contains multiple UI sections (library, favourites, AI, profile)
-  - JavaScript switches which section is visible
+### Student Dashboard (SPA-like)  
+- `jarwis.html` – main student interface  
+  - Header / navbar  
+  - Multiple UI sections inside the same page (shown/hidden by JavaScript):  
+    - **Library section** – book list, book details, favourites  
+    - **Tasks section** – to-do list with priorities and status  
+    - **Schedule section** – calendar / upcoming events view  
+    - **AI assistant section** – chat UI, conversation history  
+    - **Profile section** – user info, settings, password change  
 
-### Admin Templates
-- `admin.html`  
-- `admin/books.html`  
-- `admin/users.html`  
-- `admin/book_form.html`
+JavaScript switches which section is visible without full-page reload and communicates with the Django REST API endpoints.
+
+### Admin Templates  
+- `admin.html` – main admin dashboard shell  
+- `admin/books.html` – manage books (list, search, create/edit/delete)  
+- `admin/users.html` – manage users (list, detail, deactivate/delete)  
+- `admin/book_form.html` – create/update book form  
+- `admin/tasks.html` – optional admin tasks overview  
+- `admin/events.html` – optional admin events overview  
+
+All templates typically extend a common `jarwis.html` for shared layout (header, footer, styles).
 
 ---
 
@@ -242,7 +322,7 @@ MIT or your chosen license.
 
 # 🙌 Acknowledgements
 - Django Framework  
-- OpenAI API  
+- Voicflow API  
 - Bootstrap / Frontend libraries  
 - UFAR – Student research project
 
