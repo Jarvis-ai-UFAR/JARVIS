@@ -3,6 +3,8 @@
 JARVIS is a web-based student assistant platform built with **Django**, **HTML**, **CSS**, and **JavaScript**.  
 Its goal is to help students manage learning resources and improve their study workflow through a clean UI and AI assistance.
 
+Link: https://jarvis-ai-ufar.github.io/JARVIS/
+
 ---
 
 ## 🚀 Features
