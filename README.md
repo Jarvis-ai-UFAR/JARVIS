@@ -294,23 +294,160 @@ Dashboard behaves like a **single-page application**.
 
 
 ```text
-jarvis/
-├── manage.py
+JARVIS/
+├── README.md
+├── LICENSE
+├── .gitignore
+├── .env.example                      # example env vars (never commit real .env)
 ├── requirements.txt
+├── manage.py
 │
-├── jarvis/ # Project settings
-├── accounts/ # Auth & profile
-├── library/ # Books & favourites logic
-├── ai/ # AI assistant logic (optional)
+├── config/                           # Django project config (settings + root urls)
+│   ├── __init__.py
+│   ├── settings.py                   # INSTALLED_APPS, DB, i18n, security, static/media
+│   ├── urls.py                       # includes app urls + set_language + admin
+│   ├── asgi.py
+│   └── wsgi.py
 │
-├── templates/
-│ ├── login.html
-│ ├── register.html
-│ ├── jarwis.html
-│ ├── admin.html
-│ └── base.html
+├── apps/                             # all Django apps live here
+│   ├── core/                         # landing page + shared pages/utilities
+│   │   ├── __init__.py
+│   │   ├── urls.py                   # /  (landing), /about, /privacy (optional)
+│   │   ├── views.py
+│   │   ├── templates/core/
+│   │   │   ├── landing.html
+│   │   │   ├── base.html             # main layout (navbar/footer), extended everywhere
+│   │   │   └── components/           # reusable partials (navbar, footer, toasts)
+│   │   │       ├── navbar.html
+│   │   │       └── footer.html
+│   │   └── static/core/
+│   │       ├── css/
+│   │       ├── js/
+│   │       └── img/
+│   │
+│   ├── accounts/                     # auth + roles + profile + language preference
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                 # CustomUser or Profile model, role field
+│   │   ├── forms.py                  # RegisterForm, LoginForm, ProfileUpdateForm
+│   │   ├── services.py               # helpers (role checks, email utils)
+│   │   ├── selectors.py              # query helpers (clean DB access layer)
+│   │   ├── urls.py                   # /login /register /logout /profile /password
+│   │   ├── views.py
+│   │   ├── tests.py
+│   │   ├── migrations/
+│   │   └── templates/accounts/
+│   │       ├── login.html
+│   │       ├── register.html
+│   │       ├── profile.html          # optional (or dashboard section)
+│   │       └── password_change.html
+│   │
+│   ├── dashboard/                    # the real app entry point (protected)
+│   │   ├── __init__.py
+│   │   ├── urls.py                   # /dashboard/
+│   │   ├── views.py                  # DashboardView (login required)
+│   │   ├── tests.py
+│   │   └── templates/dashboard/
+│   │       └── jarwis.html           # SPA-like: sections shown/hidden via JS
+│   │
+│   ├── library/                      # books/resources + favourites
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                 # Resource/Book, Favourite model
+│   │   ├── selectors.py              # list/filter resources, favourites
+│   │   ├── services.py               # favourite toggle, permissions checks
+│   │   ├── urls.py                   # /books/ (html) + /api/books/ (json)
+│   │   ├── views.py
+│   │   ├── tests.py
+│   │   ├── migrations/
+│   │   └── templates/library/
+│   │       ├── book_list.html        # optional (if you also keep normal pages)
+│   │       └── book_detail.html
+│   │
+│   ├── planner/                      # tasks + schedule/events + reminders
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py                 # Task, Event
+│   │   ├── selectors.py              # upcoming events, overdue tasks
+│   │   ├── services.py               # repeat rules, priority logic, validations
+│   │   ├── urls.py                   # /api/tasks/, /api/events/
+│   │   ├── views.py
+│   │   ├── tests.py
+│   │   └── migrations/
+│   │
+│   ├── ai/                           # AI assistant (server-side tokens)
+│   │   ├── __init__.py
+│   │   ├── apps.py
+│   │   ├── models.py                 # AIConversation, AIMessage (optional)
+│   │   ├── services.py               # provider wrapper (Voiceflow/OpenAI later)
+│   │   ├── safety.py                 # red flags, rate limit helpers, logging
+│   │   ├── urls.py                   # /api/ai/chat/, /api/ai/history/
+│   │   ├── views.py
+│   │   └── tests.py
+│   │
+│   └── adminpanel/                   # your custom admin UI (not Django admin)
+│       ├── __init__.py
+│       ├── urls.py                   # /admin-panel/
+│       ├── views.py                  # manage users/resources
+│       ├── permissions.py            # admin-only decorators/mixins
+│       ├── templates/adminpanel/
+│       │   ├── admin.html
+│       │   ├── users.html
+│       │   ├── books.html
+│       │   └── book_form.html
+│       └── tests.py
 │
-└── static/ # CSS / JS / images
+├── api/                              # optional: keep all JSON endpoints grouped
+│   ├── __init__.py
+│   ├── urls.py                       # /api/ root router
+│   └── responses.py                  # standard JSON response format helpers
+│
+├── static/                           # global static (if not app-scoped)
+│   ├── css/
+│   │   ├── base.css
+│   │   └── dashboard.css
+│   ├── js/
+│   │   ├── dashboard.js              # section switching, fetch calls to /api/*
+│   │   ├── auth.js
+│   │   └── i18n.js                   # optional client helpers (if needed)
+│   └── img/
+│
+├── templates/                        # optional global shared templates
+│   └── shared/
+│       ├── base.html
+│       └── components/
+│           ├── navbar.html
+│           └── messages.html         # Django flash messages/toasts
+│
+├── locale/                           # translations (Armenian/Russian/English/French)
+│   ├── hy/LC_MESSAGES/django.po
+│   ├── ru/LC_MESSAGES/django.po
+│   ├── en/LC_MESSAGES/django.po
+│   └── fr/LC_MESSAGES/django.po
+│
+├── media/                            # uploaded PDFs/images (prod), ignored in git
+│
+├── scripts/                          # small utilities (optional)
+│   ├── seed_demo_data.py             # add demo books/tasks
+│   └── create_admin.py               # quick admin creation helper
+│
+├── docs/                             # diagrams + screenshots for reports
+│   ├── architecture/
+│   ├── ui/
+│   └── ada_checklist.md
+│
+└── deploy/                           # deployment configs (when you go production)
+    ├── nginx/
+    │   └── jarvis.conf
+    ├── systemd/
+    │   └── gunicorn.service
+    └── docker/                       # optional if you containerize later
+        ├── Dockerfile
+        └── docker-compose.yml
+
 
 
 
